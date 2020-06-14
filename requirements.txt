@@ -1,0 +1,5 @@
+retic==0.0.8
+autopep8==1.5.3
+google-api-python-client==1.9.3
+google-auth-httplib2==0.0.3
+google-auth-oauthlib==0.4.1
