@@ -55,27 +55,29 @@ class GoogleDrive():
                 pickle.dump(_creds, token)
         """Return a services that allows it interactive with the storage"""
         return build('drive', 'v3', credentials=_creds)
+    
+    def create_media_file(self, file):
+        """Media of the file"""
+        _media = MediaIoBaseUpload(
+            file,
+            mimetype=file.mimetype,
+            resumable=True
+        )        
+        return _media
 
-    def upload(self, stream, name, mimetype, parents=[]):
+    def upload(self, media_body, name, parents=[]):
         """Upload a file to google storage"""
 
         """Metadata of the file"""
         _file_metadata = {
             'name': name,
             "parents": parents
-        }
-
-        """Media of the file"""
-        _media = MediaIoBaseUpload(
-            stream,
-            mimetype=mimetype,
-            resumable=True
-        )
+        }        
 
         """Upload a file to Storage"""
         _file = self.service.files().create(
             body=_file_metadata,
-            media_body=_media,
-            fields='id'
+            media_body=media_body,
+            fields='id,size'
         ).execute()
         return _file

@@ -6,8 +6,14 @@ from retic import App as app
 # Routes
 from routes.routes import router
 
+# SQLAlchemy
+from services.sqlalchemy.sqlalchemy import config_sqlalchemy
+
 # Add routes to app
 app.use(router)
+
+# Add database to app
+app.use(config_sqlalchemy(), "db_sqlalchemy")
 
 # Crear el servidor
 app.listen(
