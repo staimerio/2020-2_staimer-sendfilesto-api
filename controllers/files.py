@@ -26,10 +26,20 @@ def upload(req: Request, res: Response):
     """Upload the file to Storage"""
     _upload = files.upload(req.files.get("files"))
 
+    """Check if the upload was done"""
+    if _upload['valid'] is False:
+        return _upload
+
+    """Save the file in the database"""
+    _file_db = files.save_file_db({
+        **_upload["data"],
+        "description": req.param('description', ""),
+        "email_to": req.param('email_to', None),
+        "email_from": req.param('email_from', None),
+    })
+
     """Check if the file did upload or response an error message"""
-    if not _upload:
-        res.bad_request(
-            error_response_service("The file did not upload.")
-        )
+    if _file_db['valid'] is False:
+        res.bad_request(_file_db)
     else:
-        res.ok(success_response_service(_upload, "The file did upload."))
+        res.ok(_file_db)
