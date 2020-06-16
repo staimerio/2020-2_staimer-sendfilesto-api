@@ -19,11 +19,11 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 # Retic
-from retic import env
+from retic import App
 
 # Constants
-TOKEN_PATH = env('TOKEN_PATH')
-CREDENTIALS_PATH = env('CREDENTIALS_PATH')
+TOKEN_PATH = App.config.get('TOKEN_PATH')
+CREDENTIALS_PATH = App.config.get('CREDENTIALS_PATH')
 """If modifying these scopes, delete the file token.pickle."""
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -58,14 +58,14 @@ class GoogleDrive():
                 pickle.dump(_creds, token)
         """Return a services that allows it interactive with the storage"""
         return build('drive', 'v3', credentials=_creds)
-    
+
     def create_media_file(self, file):
         """Media of the file"""
         _media = MediaIoBaseUpload(
             file,
             mimetype=file.mimetype,
             resumable=True
-        )        
+        )
         return _media
 
     def upload(self, media_body, name, parents=[]):
@@ -75,7 +75,7 @@ class GoogleDrive():
         _file_metadata = {
             'name': name,
             "parents": parents
-        }        
+        }
 
         """Upload a file to Storage"""
         _file = self.service.files().create(
