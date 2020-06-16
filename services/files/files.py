@@ -8,7 +8,6 @@ from services.googledrive.googledrive import GoogleDrive
 
 # Filetype
 import filetype
-
 # Models
 from models import File
 
@@ -44,7 +43,6 @@ def upload(file):
 
     """Upload to storage"""
     _file_cloud = _gd.upload(_media, file.filename, _parent)
-
     """Define the response"""
     _data_response = {
         'cloud': _file_cloud.get('id'),
