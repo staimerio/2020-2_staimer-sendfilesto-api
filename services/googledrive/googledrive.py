@@ -18,9 +18,12 @@ from googleapiclient.http import MediaIoBaseUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+# Retic
+from retic import env
+
 # Constants
-TOKEN_PATH = 'services/googledrive/token.pickle'
-CREDENTIALS_PATH = 'services/googledrive/credentials.json'
+TOKEN_PATH = env('TOKEN_PATH')
+CREDENTIALS_PATH = env('CREDENTIALS_PATH')
 """If modifying these scopes, delete the file token.pickle."""
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
