@@ -6,5 +6,5 @@ venv/
 .env
 dist
 *credentials.json
-*token.pickle
+*token.pickle*
 .htaccess
