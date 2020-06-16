@@ -15,10 +15,14 @@ app.use(router)
 # Add database to app
 app.use(config_sqlalchemy(), "db_sqlalchemy")
 
-# Crear el servidor
-app.listen(
-    use_reloader=True,
-    use_debugger=True,
-    port=1801,
-    hostname="localhost"
-)
+# # Crear el servidor
+# app.listen(
+#     use_reloader=True,
+#     use_debugger=True,
+#     port=1801,
+#     hostname="localhost"
+# )
+
+# deploy hosting
+def application(req, res):
+    return app.application(req, res)

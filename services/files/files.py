@@ -8,7 +8,7 @@ from services.googledrive.googledrive import GoogleDrive
 
 # Filetype
 import filetype
-    
+
 # Models
 from models import File
 
@@ -44,7 +44,7 @@ def upload(file):
 
     """Upload to storage"""
     _file_cloud = _gd.upload(_media, file.filename, _parent)
-    
+
     """Define the response"""
     _data_response = {
         'cloud': _file_cloud.get('id'),
@@ -74,10 +74,32 @@ def save_file_db(file_data):
 
         """Get response from db and define the response"""
         _file_db = _file.to_dict()
-        _response = success_response_service(_file_db, "The file did upload.")
+        _response = success_response_service(
+            data=_file_db, msg="The file did upload."
+        )
     except Exception as error:
-        _response = error_response_service(str(error))
+        _response = error_response_service(msg=str(error))
     finally:
         """Close session"""
         _session.close()
     return _response
+
+
+def get_by_id_db(id):
+    """Find a file in the database by an id
+
+    :param id: identificador of the file in the database, by default it is ``cloud``
+    """
+
+    """Find in database"""
+    _session = app.apps.get("db_sqlalchemy")()
+    _file = _session.query(File).filter_by(cloud=id).first()
+    _session.close()
+
+    """Check if the file exists"""
+    if not _file:
+        return error_response_service(msg="File not found.")
+    else:
+        return success_response_service(
+            data=_file.to_dict(), msg="File found."
+        )

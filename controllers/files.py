@@ -2,7 +2,7 @@
 
 # Retic
 from retic import Request, Response
-from retic.services.responses import success_response_service, error_response_service
+from retic.services.responses import error_response_service
 from retic.services.general import validate_obligate_fields
 
 # Services
@@ -41,5 +41,16 @@ def upload(req: Request, res: Response):
     """Check if the file did upload or response an error message"""
     if _file_db['valid'] is False:
         res.bad_request(_file_db)
+    else:
+        res.ok(_file_db)
+
+def get_by_id(req: Request, res: Response):
+    """Get a file by his id"""
+
+    _file_db = files.get_by_id_db(req.param("id"))
+
+    """Check if the file was found or response an error message"""
+    if _file_db['valid'] is False:
+        res.not_found(_file_db)
     else:
         res.ok(_file_db)

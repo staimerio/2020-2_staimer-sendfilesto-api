@@ -11,4 +11,5 @@ router = Router()
 
 """Define all routes - Files"""
 router \
-    .post("/files", files.upload)
+    .post("/files", files.upload) \
+    .get("/files/:id", files.get_by_id)

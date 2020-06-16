@@ -21,7 +21,7 @@ class File(Base, SerializerMixin):
     file = Column(Integer, primary_key=True)
     filename = Column(String(50))
     description = Column(String(250), default="")
-    cloud = Column(String(100), unique=True)
+    cloud = Column(String(50), unique=True)
     parent = Column(String(100))
     size = Column(Integer)
     mimetype = Column(String(20))
