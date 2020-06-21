@@ -20,7 +20,7 @@ class File(Base, SerializerMixin):
     """Attributes"""
     file = Column(Integer, primary_key=True)
     filename = Column(String(50))
-    description = Column(String(250), default="")
+    description = Column(String(280), default="")
     cloud = Column(String(50), unique=True)
     parent = Column(String(100))
     size = Column(Integer)
