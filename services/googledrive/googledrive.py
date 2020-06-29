@@ -30,9 +30,9 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 class GoogleDrive():
     def __init__(self):
         """Instance of Google Drive"""
-        self.service = self.login()
         self.storage_token_path = App.config.get('STORAGE_TOKEN_PATH')
         self.storage_credentials_path = App.config.get('STORAGE_CREDENTIALS_PATH')
+        self.service = self.login()
 
 
     def login(self):
