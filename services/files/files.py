@@ -19,7 +19,8 @@ from retic.services.responses import success_response_service, error_response_se
 from services.utils.general import get_bytes_from_mb, get_mb_from_bytes
 
 # Constants
-MAX_SIZE = get_bytes_from_mb(env("STORAGE_MAX_SIZE"))  # Max 0.05 GB, 50 MB, 51200 Kb
+# Max 0.05 GB, 50 MB, 51200 Kb
+MAX_SIZE = get_bytes_from_mb(env.int("STORAGE_MAX_SIZE"))
 
 
 def upload(file, gd):
