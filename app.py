@@ -16,12 +16,12 @@ app.use(router)
 app.use(config_sqlalchemy(), "db_sqlalchemy")
 
 # Create the web server
-app.listen(
-    use_reloader=True,
-    use_debugger=True,
-    hostname=app.env('APP_HOSTNAME', "localhost"),
-    port=app.env.int('APP_PORT', 1801),
-)
+# app.listen(
+#     use_reloader=True,
+#     use_debugger=True,
+#     hostname=app.env('APP_HOSTNAME', "localhost"),
+#     port=app.env.int('APP_PORT', 1801),
+# )
 
 
 def application(req, res):
