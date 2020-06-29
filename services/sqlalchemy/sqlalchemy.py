@@ -8,7 +8,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
-from sqlalchemy.orm.query import Query
 
 # Services
 from services.sqlalchemy.base import Base
@@ -36,10 +35,14 @@ def config_sqlalchemy():
     """Define the URI"""
     _database_uri = URL(**OPTIONS_URI)
 
-    """Define the Engine"""
+    """Define the Engine
+    https://docs.sqlalchemy.org/en/13/core/engines.html
+    """
     _engine = create_engine(_database_uri, **OPTIONS_ENGINE)
 
-    # create all models
+    """delete all models and create all models again
+    https://docs.sqlalchemy.org/en/13/core/metadata.html
+    """
     Base.metadata.drop_all(_engine)
     Base.metadata.create_all(_engine)
 

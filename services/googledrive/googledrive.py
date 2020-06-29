@@ -15,6 +15,7 @@ from io import BytesIO
 # Google
 from googleapiclient.discovery import build, MediaFileUpload
 from googleapiclient.http import MediaIoBaseUpload
+from googleapiclient.http import MediaIoBaseDownload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
@@ -22,8 +23,8 @@ from google.auth.transport.requests import Request
 from retic import App
 
 # Constants
-TOKEN_PATH = App.config.get('TOKEN_PATH')
-CREDENTIALS_PATH = App.config.get('CREDENTIALS_PATH')
+STORAGE_TOKEN_PATH = App.config.get('STORAGE_TOKEN_PATH')
+STORAGE_CREDENTIALS_PATH = App.config.get('STORAGE_CREDENTIALS_PATH')
 """If modifying these scopes, delete the file token.pickle."""
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
@@ -39,8 +40,8 @@ class GoogleDrive():
 
         _creds = None
         """Check if a token exists"""
-        if os.path.exists(TOKEN_PATH):
-            with open(TOKEN_PATH, 'rb') as token:
+        if os.path.exists(STORAGE_TOKEN_PATH):
+            with open(STORAGE_TOKEN_PATH, 'rb') as token:
                 _creds = pickle.load(token)
 
         """Check if the token doesn't exists or is invalid"""
@@ -51,10 +52,10 @@ class GoogleDrive():
             else:
                 """Generate a new token"""
                 _flow = InstalledAppFlow.from_client_secrets_file(
-                    CREDENTIALS_PATH, SCOPES)
+                    STORAGE_CREDENTIALS_PATH, SCOPES)
                 _creds = _flow.run_local_server(port=0)
             """Save the credentials for the next run"""
-            with open(TOKEN_PATH, 'wb') as token:
+            with open(STORAGE_TOKEN_PATH, 'wb') as token:
                 pickle.dump(_creds, token)
         """Return a services that allows it interactive with the storage"""
         return build('drive', 'v3', credentials=_creds)
@@ -69,7 +70,12 @@ class GoogleDrive():
         return _media
 
     def upload(self, media_body, name, parents=[]):
-        """Upload a file to google storage"""
+        """Upload a file to google storage
+
+        :param media_body: Instance of the media file for the file
+        :param name: Name of the file will be uploaded
+        :param parents: Google folder indicates where the file will be uploaded
+        """
 
         """Metadata of the file"""
         _file_metadata = {
@@ -84,3 +90,19 @@ class GoogleDrive():
             fields='id,size'
         ).execute()
         return _file
+
+    def download(self, file_id):
+        """Download a file from a specific id
+
+        :param file_id: Code of the file to will downloaded
+        https://developers.google.com/drive/api/v3/reference/files/get
+        """
+        request = self.service.files().get_media(
+            fileId=file_id
+        )
+        fh = BytesIO()
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+        return fh.getvalue()

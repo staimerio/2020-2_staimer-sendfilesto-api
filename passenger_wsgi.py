@@ -1,3 +1,4 @@
+"""Generated automatically for hosting python app"""
 import imp
 import os
 import sys
