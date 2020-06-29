@@ -18,10 +18,6 @@ from retic.services.responses import success_response_service, error_response_se
 # Utils
 from services.utils.general import get_bytes_from_mb, get_mb_from_bytes
 
-# Constants
-# Max 0.05 GB, 50 MB, 51200 Kb
-MAX_SIZE = get_bytes_from_mb(env.int("STORAGE_MAX_SIZE"))
-
 
 def upload(file, gd):
     """Upload a file to google drive
@@ -29,6 +25,8 @@ def upload(file, gd):
     :param file: File from a client, it's a stream of a file"""
 
     try:
+        MAX_SIZE = get_bytes_from_mb(env.int("STORAGE_MAX_SIZE"))
+        
         """Upload the file to Storage"""
         _parent = env("STORAGE_ROOT")
 
