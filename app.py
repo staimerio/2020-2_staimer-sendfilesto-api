@@ -9,11 +9,11 @@ from routes.routes import router
 # SQLAlchemy
 from services.sqlalchemy.sqlalchemy import config_sqlalchemy
 
-# Add routes to app
-app.use(router)
-
 # Set environment file path
 app.env.read_env('.env')
+
+# Add routes to app
+app.use(router)
 
 # Add database to app
 app.use(config_sqlalchemy(), "db_sqlalchemy")
