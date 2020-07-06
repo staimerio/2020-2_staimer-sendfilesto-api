@@ -77,7 +77,6 @@ def upload(req: Request, res: Response):
 
 def get_by_id(req: Request, res: Response):
     """Get a file by his id"""
-
     _file_db = files.get_by_id_db(req.param("id"))
 
     """Check if the file was found or response an error message"""
@@ -88,17 +87,17 @@ def get_by_id(req: Request, res: Response):
 
 
 def get_by_folder(req: Request, res: Response):
-    """Get a file by his folder"""
+    """Get files by his folder"""
 
-    _file_db = files.get_all_by_folder_db(
+    _files_db = files.get_all_by_folder_db(
         req.param("folder")
     )
 
     """Check if the file was found or response an error message"""
-    if _file_db['valid'] is False:
-        res.not_found(_file_db)
+    if _files_db['valid'] is False:
+        res.not_found(_files_db)
     else:
-        res.ok(_file_db)
+        res.ok(_files_db)
 
 
 def download_by_id(req: Request, res: Response):
