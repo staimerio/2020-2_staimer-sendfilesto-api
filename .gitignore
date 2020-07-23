@@ -1,9 +1,18 @@
-*pycache__/
+# Virtual Environment
+venv
+
+#Environment
+.env.development
+.env.production
+
+#IDE
 .vscode
-.env
-launch.json
-venv/
-.env
+*__pycache__
+
+#Deploy
+passenger_wsgi.py
+
+#App
 dist
 *credentials.json
 *token.pickle*

@@ -6,7 +6,8 @@ import uuid
 # Retic
 from retic import Request, Response
 from retic.services.responses import error_response_service, success_response_service
-from retic.services.general import validate_obligate_fields
+from retic.services.validations import validate_obligate_fields
+from retic.services.general.json import jsonify, parse
 
 # Services
 import services.files.files as files
@@ -78,12 +79,17 @@ def upload(req: Request, res: Response):
 def get_by_id(req: Request, res: Response):
     """Get a file by his id"""
     _file_db = files.get_by_id_db(req.param("id"))
-
     """Check if the file was found or response an error message"""
     if _file_db['valid'] is False:
         res.not_found(_file_db)
-    else:
-        res.ok(_file_db)
+    """Transform data"""
+    _data_response = {
+        **_file_db['data'].to_dict()
+    }
+    res.ok(success_response_service(
+        data=_data_response,
+        msg="File found."
+    ))
 
 
 def get_by_folder(req: Request, res: Response):

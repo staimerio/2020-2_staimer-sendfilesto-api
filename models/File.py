@@ -21,7 +21,9 @@ class File(Base, SerializerMixin):
     """Attributes"""
     file = Column(Integer, primary_key=True)
     filename = Column(Text)
+    title = Column(Text)
     cloud = Column(String(50), unique=True)
+    code = Column(String(50), unique=True)
     parent = Column(String(100))
     size = Column(Integer)
     mimetype = Column(String(50))
@@ -36,6 +38,6 @@ class File(Base, SerializerMixin):
 
     """Serialize settings"""
     serialize_only = (
-        'file', 'filename', 'cloud', 'parent',
-        'size', 'mimetype', 'extension', 'created_at',
+        'file', 'filename', 'code', 'size',
+        'mimetype', 'extension', 'created_at',
     )

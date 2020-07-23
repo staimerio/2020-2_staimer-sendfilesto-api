@@ -13,7 +13,7 @@ router = Router()
 """Add cors settigns"""
 router.use(cors())
 
-"""Define the options methos for all routes"""
+"""Define the options methods for all routes"""
 router.options("/*", cors())
 
 """Define all routes - Files"""

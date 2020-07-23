@@ -20,7 +20,7 @@ class Folder(Base, SerializerMixin):
 
     """Attributes"""
     folder = Column(Integer, primary_key=True)
-    code = Column(String(50))
+    code = Column(String(50), unique=True)
     description = Column(String(280), default="")
     parent = Column(String(100), nullable=True)
     # TODO: Implement email functionality.

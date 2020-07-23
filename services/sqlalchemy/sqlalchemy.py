@@ -15,22 +15,26 @@ from services.sqlalchemy.base import Base
 # Models
 from models import *
 
+# Constants
+"""Define all options"""
+OPTIONS_URI = {
+    u'drivername': App.config.get("MYSQL_DRIVERNAME"),
+    u'host': App.config.get("MYSQL_HOST"),
+    u'port': App.config.get("MYSQL_PORT", callback=int),
+    u'username': App.config.get("MYSQL_USERNAME"),
+    u'password': App.config.get("MYSQL_PASSWORD"),
+    u'database': App.config.get("MYSQL_DATABASE"),
+    u'query': App.config.get("MYSQL_QUERY"),
+}
+OPTIONS_ENGINE = {
+    u"echo": App.config.get("MYSQL_ECHO", callback=bool),
+    u"pool_pre_ping": App.config.get("MYSQL_POOL_PREPING", callback=bool),
+    u"pool_size": App.config.get("MYSQL_POOL_SIZE", callback=int),
+    u"max_overflow": App.config.get("MYSQL_MAX_OVERFLOW", callback=int),
+}
+
 
 def config_sqlalchemy():
-    """Define all options"""
-    OPTIONS_URI = {
-        u'drivername': App.config.get("MYSQL_DRIVERNAME"),
-        u'host': App.config.get("MYSQL_HOST"),
-        u'port': App.config.get("MYSQL_PORT", callback=int),
-        u'username': App.config.get("MYSQL_USERNAME"),
-        u'password': App.config.get("MYSQL_PASSWORD"),
-        u'database': App.config.get("MYSQL_DATABASE"),
-        u'query': App.config.get("MYSQL_QUERY"),
-    }
-    OPTIONS_ENGINE = {
-        u"echo": App.config.get("MYSQL_ECHO", callback=bool)
-    }
-
     """Define the URI"""
     _database_uri = URL(**OPTIONS_URI)
 
