@@ -26,14 +26,15 @@ from retic import App
 """If modifying these scopes, delete the file token.pickle."""
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
+# Constants
+STORAGE_TOKEN_PATH = App.config.get('STORAGE_TOKEN_PATH')
+STORAGE_CREDENTIALS_PATH = App.config.get('STORAGE_CREDENTIALS_PATH')
+
 
 class GoogleDrive():
     def __init__(self):
         """Instance of Google Drive"""
-        self.storage_token_path = App.config.get('STORAGE_TOKEN_PATH')
-        self.storage_credentials_path = App.config.get('STORAGE_CREDENTIALS_PATH')
         self.service = self.login()
-
 
     def login(self):
         """Login a user with credentials from a json file and 
@@ -41,8 +42,8 @@ class GoogleDrive():
 
         _creds = None
         """Check if a token exists"""
-        if os.path.exists(self.storage_token_path):
-            with open(self.storage_token_path, 'rb') as token:
+        if os.path.exists(STORAGE_TOKEN_PATH):
+            with open(STORAGE_TOKEN_PATH, 'rb') as token:
                 _creds = pickle.load(token)
 
         """Check if the token doesn't exists or is invalid"""
@@ -53,10 +54,10 @@ class GoogleDrive():
             else:
                 """Generate a new token"""
                 _flow = InstalledAppFlow.from_client_secrets_file(
-                    self.storage_credentials_path, SCOPES)
+                    STORAGE_CREDENTIALS_PATH, SCOPES)
                 _creds = _flow.run_local_server(port=0)
             """Save the credentials for the next run"""
-            with open(self.storage_token_path, 'wb') as token:
+            with open(STORAGE_TOKEN_PATH, 'wb') as token:
                 pickle.dump(_creds, token)
         """Return a services that allows it interactive with the storage"""
         return build('drive', 'v3', credentials=_creds)

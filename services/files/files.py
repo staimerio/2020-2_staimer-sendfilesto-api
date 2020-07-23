@@ -9,6 +9,9 @@ from services.googledrive.googledrive import GoogleDrive
 # Filetype
 import filetype
 
+# Uuid
+import uuid
+
 # Models
 from models import File, Folder
 
@@ -18,6 +21,9 @@ from retic.services.responses import success_response_service, error_response_se
 # Utils
 from services.utils.general import get_bytes_from_mb, get_mb_from_bytes
 
+# Constants
+MAX_SIZE = get_bytes_from_mb(env.int("STORAGE_MAX_SIZE"))
+
 
 def upload(file, gd):
     """Upload a file to google drive
@@ -25,8 +31,6 @@ def upload(file, gd):
     :param file: File from a client, it's a stream of a file"""
 
     try:
-        MAX_SIZE = get_bytes_from_mb(env.int("STORAGE_MAX_SIZE"))
-        
         """Upload the file to Storage"""
         _parent = env("STORAGE_ROOT")
 
@@ -76,21 +80,21 @@ def upload_files(files):
         _files_upload_error = []
         _gd = GoogleDrive()
         """Upload the file to Storage"""
-        for file in files:
+        for _file in files:
             """Define the media of the file"""
-            _file_cloud = upload(file, _gd)
+            _file_cloud = upload(_file, _gd)
 
             """Check if has error"""
             if _file_cloud["valid"] is False:
                 """Add file to error list"""
                 _files_upload_error.append({
                     'msg': _file_cloud['msg'],
-                    'filename': file.filename
+                    'filename': _file.filename
                 })
             else:
                 """Add file to success list"""
                 _files_upload_success.append({
-                    **_file_cloud['data']
+                    **_file_cloud['data'],
                 })
 
         """Define the response"""
@@ -117,8 +121,10 @@ def save_file_db(files, code, metadata):
 
         """Create File instance for insert to db"""
         for _file in files:
+            """Generate folder"""
+            _file_code = uuid.uuid1().hex
             """Create the scheme"""
-            _file_db = File(**_file)
+            _file_db = File(**_file, code=_file_code)
             """Into folder to file"""
             _folder_db.files.append(_file_db)
 
@@ -151,7 +157,7 @@ def get_by_id_db(id):
 
     """Find in database"""
     _session = app.apps.get("db_sqlalchemy")()
-    _file = _session.query(File).filter_by(cloud=id).first()
+    _file = _session.query(File).filter_by(code=id).first()
     _session.close()
 
     """Check if the file exists"""
@@ -159,7 +165,7 @@ def get_by_id_db(id):
         return error_response_service(msg="File not found.")
     else:
         return success_response_service(
-            data=_file.to_dict(), msg="File found."
+            data=_file
         )
 
 
@@ -205,6 +211,7 @@ def files_to_dict(files):
     """
     _files_json = list()
     for _file in files:
+        """Add file to list"""
         _files_json.append(_file.to_dict())
     return _files_json
 
@@ -218,7 +225,7 @@ def get_download_from_storage(file):
         _gd = GoogleDrive()
 
         """Get te ddata from the storage by id"""
-        _data_file = _gd.download(file['cloud'])
+        _data_file = _gd.download(file.cloud)
         """Return the data to cliente"""
         return success_response_service(
             data=_data_file
