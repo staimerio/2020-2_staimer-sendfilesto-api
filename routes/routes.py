@@ -6,6 +6,7 @@ from retic.lib.hooks.middlewares import cors
 
 # Controllers
 import controllers.files as files
+import controllers.folders as folders
 
 """Define the router instance"""
 router = Router()
@@ -24,7 +25,8 @@ router \
 
 # Folder routes
 router \
-    .get("/folders/:folder", files.get_by_folder)
+    .get("/folders/:folder", folders.get_by_folder) \
+    .delete("/folders/:folder", folders.delete_by_folder)
 
 # Download routes
 router \

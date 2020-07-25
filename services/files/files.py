@@ -169,41 +169,6 @@ def get_by_id_db(id):
         )
 
 
-def get_all_by_folder_db(code):
-    """Find all files in the database by a key and his value
-
-    :param code: identificador of the key in the database
-    """
-
-    """Find in database"""
-    _session = app.apps.get("db_sqlalchemy")()
-
-    """Search folder"""
-    _folder = _session.query(Folder).filter_by(code=code).first()
-    if not _folder:
-        return error_response_service(msg="Folder not found.")
-
-    """Search files in the folder"""
-    _files = _session.query(File).join(
-        File.folders).filter_by(code=code)
-
-    """Close the session"""
-    _session.close()
-
-    """Get response from db and define the response"""
-    _files_json = files_to_dict(_files)
-    _folder_json = _folder.to_dict()
-
-    """Transform the response to client"""
-    _data_response = {
-        u"success": _files_json,
-        **_folder_json,
-    }
-    return success_response_service(
-        data=_data_response, msg="Files found."
-    )
-
-
 def files_to_dict(files):
     """Get response from db and define the
 

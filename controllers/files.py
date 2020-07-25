@@ -7,7 +7,6 @@ import uuid
 from retic import Request, Response
 from retic.services.responses import error_response_service, success_response_service
 from retic.services.validations import validate_obligate_fields
-from retic.services.general.json import jsonify, parse
 
 # Services
 import services.files.files as files
@@ -90,20 +89,6 @@ def get_by_id(req: Request, res: Response):
         data=_data_response,
         msg="File found."
     ))
-
-
-def get_by_folder(req: Request, res: Response):
-    """Get files by his folder"""
-
-    _files_db = files.get_all_by_folder_db(
-        req.param("folder")
-    )
-
-    """Check if the file was found or response an error message"""
-    if _files_db['valid'] is False:
-        res.not_found(_files_db)
-    else:
-        res.ok(_files_db)
 
 
 def download_by_id(req: Request, res: Response):
