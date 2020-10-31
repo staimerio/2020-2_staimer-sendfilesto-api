@@ -59,6 +59,7 @@ def upload(file, gd):
         _data_response = {
             'cloud': _file_cloud.get('id'),
             'filename': file.filename,
+            'title': file.filename,
             'parent': _parent,
             'size': _file_cloud.get('size'),
             'mimetype': file.mimetype,

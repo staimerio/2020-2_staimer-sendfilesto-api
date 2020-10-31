@@ -7,10 +7,13 @@ import uuid
 from retic import Request, Response
 from retic.services.responses import error_response_service, success_response_service
 from retic.services.validations import validate_obligate_fields
+from retic import App
 
 # Services
 import services.files.files as files
 
+# Constants
+PLATFORM_DEFAULT = App.config.get('PLATFORM_DEFAULT')
 
 def upload(req: Request, res: Response):
     """Upload to Storage"""
@@ -53,6 +56,7 @@ def upload(req: Request, res: Response):
         _folder_code,
         {
             "description": req.param('description', ""),
+            "platform": req.param('platform', PLATFORM_DEFAULT, int),
             # TODO: Implement email functionality.
             # "email_to": req.param('email_to', None),
             # "email_from": req.param('email_from', None),

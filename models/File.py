@@ -20,14 +20,16 @@ class File(Base, SerializerMixin):
 
     """Attributes"""
     file = Column(Integer, primary_key=True)
-    filename = Column(Text)
-    title = Column(Text)
-    cloud = Column(String(50), unique=True)
+    filename = Column(String(250))
+    title = Column(String(250))
+    cloud = Column(String(250))
     code = Column(String(50), unique=True)
     parent = Column(String(100))
     size = Column(Integer)
     mimetype = Column(String(50))
     extension = Column(String(10))
+    width = Column(Integer, default=None)
+    height = Column(Integer, default=None)
     is_active = Column(Boolean, default=True)
     is_deleted = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.now())
@@ -40,4 +42,5 @@ class File(Base, SerializerMixin):
     serialize_only = (
         'file', 'filename', 'code', 'size',
         'mimetype', 'extension', 'created_at',
+        'width', 'height', 'title', 'parent'
     )

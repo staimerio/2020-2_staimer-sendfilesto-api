@@ -17,3 +17,4 @@ dist
 *credentials.json
 *token.pickle*
 .htaccess
+alembic.ini
