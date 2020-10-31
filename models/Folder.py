@@ -1,7 +1,7 @@
 """Model for folders"""
 
 # SQLAlchemy
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
 # SQLAlchemy_serializer
@@ -23,6 +23,7 @@ class Folder(Base, SerializerMixin):
     code = Column(String(50), unique=True)
     description = Column(String(280), default="")
     parent = Column(String(100), nullable=True)
+    platform = Column(Integer, ForeignKey('platforms.platform'))
     # TODO: Implement email functionality.
     # email_to = Column(String(50))
     # email_from = Column(String(50))
@@ -36,5 +37,5 @@ class Folder(Base, SerializerMixin):
 
     """Serialize settings"""
     serialize_only = (
-        'code', 'description', 'parent', 'created_at'
+        'code', 'description', 'parent', 'platform', 'created_at'
     )
