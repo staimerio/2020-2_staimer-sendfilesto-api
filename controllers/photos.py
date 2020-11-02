@@ -18,8 +18,6 @@ PLATFORM_DEFAULT = App.config.get('PLATFORM_DEFAULT')
 
 
 def upload(req: Request, res: Response):
-    """Upload to Storage"""
-
     """Generate folder"""
     _album_code = req.param('album', default_value=uuid.uuid1().hex)
     if req.param('urls'):
@@ -37,10 +35,21 @@ def upload(req: Request, res: Response):
     """Check if the upload was done"""
     if _upload_list['valid'] is False:
         return res.bad_request(_upload_list)
+
+    if not _upload_list['data']['success']:
+        return res.bad_request(success_response_service(
+            {
+                u'success': [],
+                u'error': _upload_list['data']['error']
+            }
+        ))
     """Upload the file to Storage"""
     _uploaded_list = photos.upload_photos(
         _upload_list['data']['success'], _album_code, req.param('album', callback=bool))
 
+    """Check if the upload was done"""
+    if _uploaded_list['valid'] is False:
+        return res.bad_request(_uploaded_list)
     """Save the file in the database"""
     _photos_db = photos.save_file_db(
         _uploaded_list["data"]["success"],

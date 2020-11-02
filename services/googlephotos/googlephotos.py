@@ -158,6 +158,7 @@ class GooglePhotos():
     def upload_photos_album(self, photos, album, hasAlbum):
         """Upload files to Album"""
         _uploaded_photos = []
+        _uploaded_error = []
         _album = {
             "album": {
                 "title": album
@@ -179,39 +180,44 @@ class GooglePhotos():
         else:
             """Use the album passed in the parameters"""
             _album_id = album
-        """Create request body"""
-        _request_body = {
-            "albumId": _album_id,
-            'newMediaItems': [
-                {
-                    'description': photo['filename'],
-                    'simpleMediaItem': {
-                        'uploadToken': photo['uploadToken']
-                    }
-                } for photo in photos
-            ]
-        }
-        _upload_response = self.service.mediaItems(
-        ).batchCreate(body=_request_body).execute()
-
-        _results = _upload_response['newMediaItemResults']
 
         """Merge the information with original photos"""
         for _photo in photos:
+
+            """Create request body"""
+            _request_body = {
+                "albumId": _album_id,
+                'newMediaItems': [
+                    {
+                        'description': _photo['filename'],
+                        'simpleMediaItem': {
+                            'uploadToken': _photo['uploadToken']
+                        }
+                    }
+                ]
+            }
+            _upload_response = self.service.mediaItems(
+            ).batchCreate(body=_request_body).execute()
+
+            _results = _upload_response['newMediaItemResults']
+
             _uploaded_photo = None
             for _gphoto in _results:
                 if _gphoto['uploadToken'] == _photo['uploadToken']:
                     _uploaded_photo = _gphoto
                     break
-            if _uploaded_photo:
+            if _uploaded_photo and 'mediaItem' in _uploaded_photo:
                 _uploaded_photos.append(
                     {
                         **_photo,
                         **_uploaded_photo['mediaItem']
                     }
                 )
+            else:
+                _uploaded_error.append(_uploaded_photo)
         _response = {
-            u'photos': _uploaded_photos
+            u'photos': _uploaded_photos,
+            u'error': _uploaded_error
         }
         return _response
 
