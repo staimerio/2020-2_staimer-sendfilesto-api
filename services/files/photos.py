@@ -88,18 +88,21 @@ def download_photos_remote(urls, headers):
     _images_error = []
     try:
         async def get_download_item_req(url):
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url=url, headers=headers) as response:
-                    _downloaded_image = await response.read()
-                    if _downloaded_image:
-                        _images_success.append(
-                            {
-                                u'binary': _downloaded_image,
-                                u'filename': url.split('/')[-1]
-                            }
-                        )
-                    else:
-                        _images_error.append({u'url': url})
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url=url, headers=headers) as response:
+                        _downloaded_image = await response.read()
+                        if _downloaded_image:
+                            _images_success.append(
+                                {
+                                    u'binary': _downloaded_image,
+                                    u'filename': url.split('/')[-1]
+                                }
+                            )
+                        else:
+                            _images_error.append({u'url': url})
+            except Exception as e:
+                _images_error.append({u'url': url})
 
         async def main():
             promises = [get_download_item_req(_url)
@@ -148,7 +151,7 @@ def upload_photos(photos, album, hasAlbum):
                 'success': [],
                 'error': _files_upload_error,
             }
-            return success_response_service(_data_response)
+            return error_response_service(_data_response)
 
         """Upload to storage"""
         _files_cloud = _gphotos.async_upload_pothos(_files_upload)
@@ -178,7 +181,7 @@ def upload_photos(photos, album, hasAlbum):
         """Define the response"""
         _data_response = {
             'success': _files_upload_success,
-            'error': _files_upload_error,
+            'error': (_files_upload_error or []) + (_files_upload_cloud['error'] or []),
         }
         return success_response_service(_data_response)
     except Exception as err:
