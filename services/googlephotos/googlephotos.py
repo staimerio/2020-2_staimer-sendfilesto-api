@@ -155,6 +155,46 @@ class GooglePhotos():
                 msg=str(err)
             )
 
+    def sync_upload_pothos(self, photos):
+        """Upload a file to google storage
+
+        :param photos: Photos to uploaded
+        """
+        _uploaded_photos = []
+        try:
+            def upload_item_req(photo):
+                headers = {
+                    'Authorization': 'Bearer ' + self.token.token,
+                    'Content-type': photo['mimetype'],
+                    'X-Goog-Upload-Protocol': 'raw',
+                    'X-Goog-Upload-File-Name': photo['filename']
+                }
+                img = photo['binary']
+                response = requests.post(
+                    url=upload_url, data=img, headers=headers)
+                _uploaded_image = response.content
+                if _uploaded_image:
+                    _uploaded_photos.append(
+                        {
+                            **photo,
+                            u'uploadToken': _uploaded_image.decode('utf-8'),
+                        }
+                    )
+            for photo in photos:
+                upload_item_req(photo)
+
+            """Define response of the service"""
+            _response = {
+                u'photos': _uploaded_photos
+            }
+            return success_response_service(
+                data=_response
+            )
+        except Exception as err:
+            return error_response_service(
+                msg=str(err)
+            )
+
     def upload_photos_album(self, photos, album, hasAlbum):
         """Upload files to Album"""
         _uploaded_photos = []

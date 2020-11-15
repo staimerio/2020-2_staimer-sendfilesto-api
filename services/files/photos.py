@@ -40,7 +40,11 @@ def upload(file, gphotos):
 
         _filename_split = file['filename'].split('.')
         _slug = slugify(_filename_split[0])
-        _extension = _filename_split[-1]
+        if len(_filename_split) > 1:
+            _extension = _filename_split[-1]
+        else:
+            _extension = "png"
+            file['filename'] = "{0}.{1}".format(_slug, _extension)
 
         _extension_full = ".{0}".format(_extension)
 
@@ -141,6 +145,7 @@ def upload_photos(photos, album, hasAlbum):
             _file_cloud = upload(_file, _gphotos)
             """Check if has error"""
             if _file_cloud["valid"] is False:
+                del _file['binary']
                 _files_upload_error.append(_file)
             else:
                 _files_upload.append(_file_cloud['data'])
@@ -154,7 +159,10 @@ def upload_photos(photos, album, hasAlbum):
             return error_response_service(_data_response)
 
         """Upload to storage"""
-        _files_cloud = _gphotos.async_upload_pothos(_files_upload)
+        if(len(_files_upload) > 20):
+            _files_cloud = _gphotos.sync_upload_pothos(_files_upload)
+        else:
+            _files_cloud = _gphotos.async_upload_pothos(_files_upload)
 
         """Check if its valid"""
         if _files_cloud['valid'] is False:
