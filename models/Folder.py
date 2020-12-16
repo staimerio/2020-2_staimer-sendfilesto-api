@@ -34,6 +34,7 @@ class Folder(Base, SerializerMixin):
 
     """Relationships"""
     files = relationship('File', secondary='folders_files')
+    objects = relationship('Object', secondary='folders_objects')
 
     """Serialize settings"""
     serialize_only = (

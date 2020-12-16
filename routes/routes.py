@@ -8,6 +8,7 @@ from retic.lib.hooks.middlewares import cors
 import controllers.files as files
 import controllers.folders as folders
 import controllers.photos as photos
+import controllers.photos_folder as photos_folder
 
 """Define the router instance"""
 router = Router()
@@ -29,6 +30,12 @@ router \
     .post("/photos", photos.upload)
 router \
     .get("/photos/:album/:filename", photos.show_by_filename)
+
+    
+router \
+    .post("/photos/folder", photos_folder.upload_folder)
+router \
+    .get("/photos/folder/:album/:code/:filename", photos_folder.show_by_code)
 
 # Folder routes
 router \
