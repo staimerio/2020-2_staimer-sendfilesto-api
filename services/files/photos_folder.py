@@ -161,10 +161,10 @@ def upload_photos(photos, album, hasAlbum):
             return error_response_service(_data_response)
 
         """Upload to storage"""
-        if(len(_files_upload) > 20):
-            _files_cloud = _gphotos.sync_upload_pothos(_files_upload)
-        else:
-            _files_cloud = _gphotos.async_upload_pothos(_files_upload)
+        #if(len(_files_upload) > 20):
+        _files_cloud = _gphotos.sync_upload_pothos(_files_upload)
+        #else:
+            #_files_cloud = _gphotos.async_upload_pothos(_files_upload)
 
         """Check if its valid"""
         if _files_cloud['valid'] is False:
