@@ -173,9 +173,10 @@ def upload_photos(photos, album, hasAlbum):
         _files_upload_cloud = _gphotos.upload_photos_album(
             _files_cloud['data']['photos'], album, hasAlbum)
 
-        for _file_upload_cloud in _files_upload_cloud['photos']:
+        for idx, _file_upload_cloud in enumerate(_files_upload_cloud['photos']):
             """Define the response"""
             _data_response = {
+                'number': idx,
                 'cloud': _file_upload_cloud['id'],
                 'filename': _file_upload_cloud['filename_slug'],
                 'title': _file_upload_cloud['filename'],
