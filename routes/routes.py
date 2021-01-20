@@ -9,6 +9,7 @@ import controllers.files as files
 import controllers.folders as folders
 import controllers.photos as photos
 import controllers.photos_folder as photos_folder
+import controllers.files_folder as files_folder
 
 """Define the router instance"""
 router = Router()
@@ -24,6 +25,11 @@ router.options("/*", cors())
 router \
     .post("/files", files.upload) \
     .get("/files/:id", files.get_by_id)
+
+router \
+    .post("/files/folder", files_folder.upload_folder)
+router \
+    .get("/files/folder/:folder/:code/:filename", files_folder.show_by_code)
 
 # Photos routes
 router \

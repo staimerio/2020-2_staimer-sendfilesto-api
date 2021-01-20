@@ -19,6 +19,12 @@ from googleapiclient.http import MediaIoBaseDownload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+# base64
+from base64 import b64decode
+
+# Mimetypes
+import mimetypes
+
 # Retic
 from retic import App
 
@@ -29,6 +35,8 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 # Constants
 STORAGE_TOKEN_PATH = App.config.get('STORAGE_TOKEN_PATH')
 STORAGE_CREDENTIALS_PATH = App.config.get('STORAGE_CREDENTIALS_PATH')
+
+mimetypes.init()
 
 
 class GoogleDrive():
@@ -66,7 +74,7 @@ class GoogleDrive():
         """Media of the file"""
         _media = MediaIoBaseUpload(
             file,
-            mimetype=file.mimetype,
+            mimetype=file['mimetype'] if 'mimetype' in file else file.mimetype,
             resumable=True
         )
         return _media
@@ -108,3 +116,14 @@ class GoogleDrive():
         while done is False:
             status, done = downloader.next_chunk()
         return fh.getvalue()
+
+    def create_media_file_from_binary(self, file, extension=None, mimetype=None):
+        _file = BytesIO(file)
+        _mimetype = mimetypes.types_map[extension] if extension else mimetype if mimetype else 'application/octet-stream'
+        """Media of the file"""
+        _media = MediaIoBaseUpload(
+            _file,
+            mimetype=_mimetype,
+            resumable=True
+        )
+        return _media
