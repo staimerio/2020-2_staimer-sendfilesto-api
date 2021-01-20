@@ -38,6 +38,9 @@ from retic import App
 # base64
 from base64 import b64decode
 
+# Time
+from time import sleep
+
 # Services
 from retic.services.responses import success_response_service, error_response_service
 
@@ -180,8 +183,16 @@ class GooglePhotos():
                             u'uploadToken': _uploaded_image.decode('utf-8'),
                         }
                     )
-            for photo in photos:
+            _count = 0
+            for idx, photo in enumerate(photos):
                 upload_item_req(photo)
+
+                if(_count == 30):
+                    for idj in range(0, _count):
+                        sleep(1)
+                    _count = 0
+                else:
+                    _count += 1
 
             """Define response of the service"""
             _response = {
@@ -192,7 +203,7 @@ class GooglePhotos():
             )
         except Exception as err:
             return error_response_service(
-                msg=str(err)
+                msg='{0} images {1}'.format(len(_uploaded_photos), str(err))
             )
 
     def upload_photos_album(self, photos, album, hasAlbum):
@@ -221,8 +232,16 @@ class GooglePhotos():
             """Use the album passed in the parameters"""
             _album_id = album
 
+        _count = 0
         """Merge the information with original photos"""
-        for _photo in photos:
+        for idx, _photo in enumerate(photos):
+
+            if(_count == 30):
+                for idj in range(0, _count):
+                    sleep(1)
+                _count = 0
+            else:
+                _count += 1
 
             """Create request body"""
             _request_body = {

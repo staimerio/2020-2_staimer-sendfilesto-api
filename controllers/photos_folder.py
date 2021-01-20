@@ -15,9 +15,17 @@ from services.files import photos_folder
 
 # Constants
 PLATFORM_DEFAULT = App.config.get('PLATFORM_DEFAULT')
+# MAX_SIZE_URLS = App.config.get('MAX_SIZE_URLS', callback=int)
 
 
 def upload_folder(req: Request, res: Response):
+    # """Validar limite de images"""
+    # if(len(req.param('urls')) > MAX_SIZE_URLS):
+    #     return res.bad_request(
+    #         error_response_service(
+    #             "Maximo de urls enviadas."
+    #         )
+    #     )
     """Generate folder"""
     _album_code = req.param('album', default_value=uuid.uuid1().hex)
     if req.param('urls'):
@@ -77,6 +85,7 @@ def upload_folder(req: Request, res: Response):
         data=_data_response,
         msg="The upload finishied."
     ))
+
 
 def show_by_code(req: Request, res: Response):
     """Download a file from a id"""

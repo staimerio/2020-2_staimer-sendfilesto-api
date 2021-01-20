@@ -30,7 +30,9 @@ from services.utils.general import get_bytes_from_mb, get_mb_from_bytes
 # Constants
 MAX_SIZE = get_bytes_from_mb(env.int("STORAGE_MAX_SIZE"))
 
-
+# import codecs
+# with codecs.open('a.txt', mode='w', encoding='utf-8') as f:
+#     f.write('français')
 def upload(file, gphotos):
     """Upload a file to google drive
 
