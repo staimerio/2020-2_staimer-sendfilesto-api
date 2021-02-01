@@ -61,6 +61,7 @@ upload_url = 'https://photoslibrary.googleapis.com/v1/uploads'
 mimetypes.init()
 
 
+import codecs
 class GooglePhotos():
     def __init__(self):
         """Instance of Google Drive"""
@@ -188,12 +189,14 @@ class GooglePhotos():
                 upload_item_req(photo)
 
                 if(_count == 30):
-                    for idj in range(0, _count):
+                    for idj in range(0, 60):
                         sleep(1)
                     _count = 0
                 else:
                     _count += 1
-
+                
+                # with codecs.open('b.txt', mode='w', encoding='utf-8') as f:
+                #     f.write('{0}'.format(_count))
             """Define response of the service"""
             _response = {
                 u'photos': _uploaded_photos
@@ -232,16 +235,18 @@ class GooglePhotos():
             """Use the album passed in the parameters"""
             _album_id = album
 
-        _count = 0
+        _count = 30
         """Merge the information with original photos"""
         for idx, _photo in enumerate(photos):
 
             if(_count == 30):
-                for idj in range(0, _count):
+                for idj in range(0, 60):
                     sleep(1)
                 _count = 0
             else:
                 _count += 1
+            # with codecs.open('a.txt', mode='w', encoding='utf-8') as f:
+            #     f.write('{0}'.format(_count))
 
             """Create request body"""
             _request_body = {
