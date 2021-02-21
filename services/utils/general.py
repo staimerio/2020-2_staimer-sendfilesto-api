@@ -1,5 +1,6 @@
 """Services for general utils"""
-
+# Os
+import os
 
 def get_bytes_from_mb(size):
     """Get bytes from a size in megabytes
@@ -15,3 +16,12 @@ def get_mb_from_bytes(size):
     :param size: Integer value in bytes
     """
     return size/1024/1024
+
+
+
+def rmfile(path):
+    """Delete files from a path
+
+    :param path: Path of the folder with files to will delete
+    """
+    os.remove(path)

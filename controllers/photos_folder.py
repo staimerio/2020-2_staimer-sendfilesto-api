@@ -12,6 +12,8 @@ from retic import App
 
 # Services
 from services.files import photos_folder
+from services.images import images
+
 
 # Constants
 PLATFORM_DEFAULT = App.config.get('PLATFORM_DEFAULT')
@@ -51,9 +53,13 @@ def upload_folder(req: Request, res: Response):
                 u'error': _upload_list['data']['error']
             }
         ))
+
+    _compressed_images = images.compress_images(
+        _upload_list['data']['success'])
+
     """Upload the file to Storage"""
     _uploaded_list = photos_folder.upload_photos(
-        _upload_list['data']['success'], _album_code, req.param('album', callback=bool))
+        _compressed_images, _album_code, req.param('album', callback=bool))
 
     """Check if the upload was done"""
     if _uploaded_list['valid'] is False:

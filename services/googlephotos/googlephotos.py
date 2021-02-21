@@ -5,6 +5,7 @@ Source: https://developers.google.com/photos/library/guides/access-media-items
 """
 
 # Pickle
+import codecs
 import pickle
 
 # Os
@@ -59,9 +60,9 @@ PHOTOS_CREDENTIALS_PATH = App.config.get('PHOTOS_CREDENTIALS_PATH')
 image_dir = os.path.join(os.getcwd(), 'Images To Upload')
 upload_url = 'https://photoslibrary.googleapis.com/v1/uploads'
 mimetypes.init()
+SLEEP_TIME = 40
 
 
-import codecs
 class GooglePhotos():
     def __init__(self):
         """Instance of Google Drive"""
@@ -188,13 +189,13 @@ class GooglePhotos():
             for idx, photo in enumerate(photos):
                 upload_item_req(photo)
 
-                if(_count == 30):
+                if(_count == SLEEP_TIME):
                     for idj in range(0, 60):
                         sleep(1)
                     _count = 0
                 else:
                     _count += 1
-                
+
                 # with codecs.open('b.txt', mode='w', encoding='utf-8') as f:
                 #     f.write('{0}'.format(_count))
             """Define response of the service"""
@@ -235,11 +236,11 @@ class GooglePhotos():
             """Use the album passed in the parameters"""
             _album_id = album
 
-        _count = 30
+        _count = SLEEP_TIME
         """Merge the information with original photos"""
         for idx, _photo in enumerate(photos):
 
-            if(_count == 30):
+            if(_count == SLEEP_TIME):
                 for idj in range(0, 60):
                     sleep(1)
                 _count = 0
