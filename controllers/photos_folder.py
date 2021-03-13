@@ -17,6 +17,7 @@ from services.images import images
 
 # Constants
 PLATFORM_DEFAULT = App.config.get('PLATFORM_DEFAULT')
+STORAGE_CREDENTIALS_DEFAULT = App.config.get('STORAGE_CREDENTIALS_DEFAULT')
 # MAX_SIZE_URLS = App.config.get('MAX_SIZE_URLS', callback=int)
 
 
@@ -30,6 +31,9 @@ def upload_folder(req: Request, res: Response):
     #     )
     """Generate folder"""
     _album_code = req.param('album', default_value=uuid.uuid1().hex)
+    _credential = req.param(
+        'credential', default_value=STORAGE_CREDENTIALS_DEFAULT)
+
     if req.param('urls'):
         """Upload the file to Storage"""
         _upload_list = photos_folder.download_photos_remote(
@@ -59,7 +63,10 @@ def upload_folder(req: Request, res: Response):
 
     """Upload the file to Storage"""
     _uploaded_list = photos_folder.upload_photos(
-        _compressed_images, _album_code, req.param('album', callback=bool))
+        _compressed_images, _album_code, req.param('album', callback=bool),
+        noSleep=req.param('no_sleep', callback=bool),
+        credential=_credential,
+    )
 
     """Check if the upload was done"""
     if _uploaded_list['valid'] is False:
@@ -74,7 +81,8 @@ def upload_folder(req: Request, res: Response):
             # TODO: Implement email functionality.
             # "email_to": req.param('email_to', None),
             # "email_from": req.param('email_from', None),
-        }
+        },
+        credential=_credential
     )
 
     """Check if the file did upload or response an error message"""
@@ -121,7 +129,8 @@ def show_by_code(req: Request, res: Response):
 
     """Download from storage by id"""
     _download_file = photos_folder.get_download_from_storage(
-        _photo_db['data'], req.param("filename")
+        file=_photo_db['data']['object'], folder=_photo_db['data']['folder'], filename=req.param(
+            "filename")
     )
     """Return the data to client"""
     if _download_file['valid'] is False:

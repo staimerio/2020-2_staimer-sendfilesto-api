@@ -128,7 +128,7 @@ def download_photos_remote(urls, headers):
         )
 
 
-def upload_photos(photos, album, hasAlbum):
+def upload_photos(photos, album, hasAlbum, credential):
     """Upload a url list to google photos
 
     :param urls: Urls from a client, it's a url list of a files
@@ -138,7 +138,7 @@ def upload_photos(photos, album, hasAlbum):
         _files_upload = []
         _files_upload_success = []
         _files_upload_error = []
-        _gphotos = GooglePhotos()
+        _gphotos = GooglePhotos(credential=credential)
 
         for _file in photos:
             """Define the media of the file"""

@@ -34,7 +34,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 # Retic
-from retic import App
+from retic import env, App
 
 # base64
 from base64 import b64decode
@@ -44,6 +44,10 @@ from time import sleep
 
 # Services
 from retic.services.responses import success_response_service, error_response_service
+from retic.services.general.json import jsonify, parse
+
+# Models
+from models import Credential
 
 # Constants
 """If modifying these scopes, delete the file token.pickle."""
@@ -55,6 +59,7 @@ SCOPES = [
 # Constants
 PHOTOS_TOKEN_PATH = App.config.get('PHOTOS_TOKEN_PATH')
 PHOTOS_CREDENTIALS_PATH = App.config.get('PHOTOS_CREDENTIALS_PATH')
+STORAGE_CREDENTIALS_DEFAULT = App.config.get('STORAGE_CREDENTIALS_DEFAULT')
 # PHOTOS_ROOT = App.config.get('PHOTOS_ROOT')
 
 image_dir = os.path.join(os.getcwd(), 'Images To Upload')
@@ -64,9 +69,9 @@ SLEEP_TIME = 40
 
 
 class GooglePhotos():
-    def __init__(self):
+    def __init__(self, credential=STORAGE_CREDENTIALS_DEFAULT):
         """Instance of Google Drive"""
-        self.service = self.login()
+        self.service = self.login_v2(credential)
 
     def login(self):
         """Login a user with credentials from a json file and
@@ -93,6 +98,48 @@ class GooglePhotos():
             with open(PHOTOS_TOKEN_PATH, 'wb') as token:
                 pickle.dump(_creds, token)
                 self.token = _creds
+        """Return a services that allows it interactive with the storage"""
+        service = build('photoslibrary', 'v1', credentials=_creds)
+        # Call the Photo v1 API
+        # results = service.albums().list(
+        #     pageSize=10, fields="nextPageToken,albums(id,title)").execute()
+
+        # imgs_response = service.mediaItems().batchGet(
+        #     mediaItemIds=[
+        #         'AP7Z0LgMS8ZpRJBJe4qI-By9c23uW4nv1WmJSI65bt0rcFmlu7zG4ud4FWcTY9eYmqtzXfACm_LkROK10GZaNexhInWDUM6WWg']
+        # ).execute()
+        return service
+
+    def login_v2(self, credential):
+        """Login a user with credentials from a json file and
+        create a token for the next requests"""
+
+        """Get credential from db"""
+        _session = App.apps.get("db_sqlalchemy")()
+        _credential_db = _session.query(Credential).filter_by(
+            credential=credential).first()
+
+        _creds = None
+        """Check if a token exists"""
+        if _credential_db.picky:
+            _creds = pickle.loads(_credential_db.picky)
+            self.token = _creds
+        """Check if the token doesn't exists or is invalid"""
+        if not _creds or not _creds.valid:
+            if _creds and _creds.expired and _creds.refresh_token:
+                """If the token expired, refresh the token"""
+                _creds.refresh(Request())
+            else:
+                """Generate a new token"""
+                _flow = InstalledAppFlow.from_client_config(
+                    parse(_credential_db.key), SCOPES)
+                _creds = _flow.run_local_server(port=0)
+
+            """Save the credentials for the next run"""
+            _credential_db.picky = pickle.dumps(_creds)
+            _session.commit()
+
+            self.token = _creds
         """Return a services that allows it interactive with the storage"""
         service = build('photoslibrary', 'v1', credentials=_creds)
         # Call the Photo v1 API
@@ -160,7 +207,7 @@ class GooglePhotos():
                 msg=str(err)
             )
 
-    def sync_upload_pothos(self, photos):
+    def sync_upload_pothos(self, photos, noSleep):
         """Upload a file to google storage
 
         :param photos: Photos to uploaded
@@ -189,7 +236,7 @@ class GooglePhotos():
             for idx, photo in enumerate(photos):
                 upload_item_req(photo)
 
-                if(_count == SLEEP_TIME):
+                if(not noSleep and _count == SLEEP_TIME):
                     for idj in range(0, 60):
                         sleep(1)
                     _count = 0
@@ -210,7 +257,7 @@ class GooglePhotos():
                 msg='{0} images {1}'.format(len(_uploaded_photos), str(err))
             )
 
-    def upload_photos_album(self, photos, album, hasAlbum):
+    def upload_photos_album(self, photos, album, hasAlbum, noSleep):
         """Upload files to Album"""
         _uploaded_photos = []
         _uploaded_error = []
@@ -219,28 +266,28 @@ class GooglePhotos():
                 "title": album
             }
         }
-        if not hasAlbum:
-            """If the album doesnot exist, create a new album from the code"""
-            album_response = self.service.albums().create(body=_album).execute()
-            _album_id = album_response['id']
-            _share = {
-                "sharedAlbumOptions": {
-                    "isCollaborative": "true",
-                    "isCommentable": "true"
-                }
+        # if not hasAlbum:
+        """If the album doesnot exist, create a new album from the code"""
+        album_response = self.service.albums().create(body=_album).execute()
+        _album_id = album_response['id']
+        _share = {
+            "sharedAlbumOptions": {
+                "isCollaborative": "true",
+                "isCommentable": "true"
             }
-            """Make public the album"""
-            _share_response = self.service.albums().share(
-                albumId=_album_id, body=_share).execute()
-        else:
-            """Use the album passed in the parameters"""
-            _album_id = album
+        }
+        """Make public the album"""
+        _share_response = self.service.albums().share(
+            albumId=_album_id, body=_share).execute()
+        # else:
+        #     """Use the album passed in the parameters"""
+        #     _album_id = album
 
         _count = SLEEP_TIME
         """Merge the information with original photos"""
         for idx, _photo in enumerate(photos):
 
-            if(_count == SLEEP_TIME):
+            if(not noSleep and _count == SLEEP_TIME):
                 for idj in range(0, 60):
                     sleep(1)
                 _count = 0

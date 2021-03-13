@@ -16,7 +16,7 @@ import asyncio
 import aiohttp
 
 # Models
-from models import File, Folder, Object
+from models import File, Folder, Object, FolderObject
 
 # Services
 from retic.services.responses import success_response_service, error_response_service
@@ -33,6 +33,8 @@ MAX_SIZE = get_bytes_from_mb(env.int("STORAGE_MAX_SIZE"))
 # import codecs
 # with codecs.open('a.txt', mode='w', encoding='utf-8') as f:
 #     f.write('français')
+
+
 def upload(file, gphotos):
     """Upload a file to google drive
 
@@ -132,7 +134,7 @@ def download_photos_remote(urls, headers):
         )
 
 
-def upload_photos(photos, album, hasAlbum):
+def upload_photos(photos, album, hasAlbum, noSleep, credential):
     """Upload a url list to google photos
 
     :param urls: Urls from a client, it's a url list of a files
@@ -142,7 +144,7 @@ def upload_photos(photos, album, hasAlbum):
         _files_upload = []
         _files_upload_success = []
         _files_upload_error = []
-        _gphotos = GooglePhotos()
+        _gphotos = GooglePhotos(credential=credential)
 
         for _file in photos:
             """Define the media of the file"""
@@ -163,17 +165,17 @@ def upload_photos(photos, album, hasAlbum):
             return error_response_service(_data_response)
 
         """Upload to storage"""
-        #if(len(_files_upload) > 20):
-        _files_cloud = _gphotos.sync_upload_pothos(_files_upload)
-        #else:
-            #_files_cloud = _gphotos.async_upload_pothos(_files_upload)
+        # if(len(_files_upload) > 20):
+        _files_cloud = _gphotos.sync_upload_pothos(_files_upload, noSleep)
+        # else:
+        #_files_cloud = _gphotos.async_upload_pothos(_files_upload)
 
         """Check if its valid"""
         if _files_cloud['valid'] is False:
             return _files_cloud
 
         _files_upload_cloud = _gphotos.upload_photos_album(
-            _files_cloud['data']['photos'], album, hasAlbum)
+            _files_cloud['data']['photos'], album, hasAlbum, noSleep)
 
         for idx, _file_upload_cloud in enumerate(_files_upload_cloud['photos']):
             """Define the response"""
@@ -201,7 +203,7 @@ def upload_photos(photos, album, hasAlbum):
         return error_response_service(str(err))
 
 
-def save_file_db(files, album_id, metadata):
+def save_file_db(files, album_id, metadata, credential):
     """Create the new schema
 
     :param files: Storage files that contains information about the upload of the files
@@ -212,7 +214,7 @@ def save_file_db(files, album_id, metadata):
     _session = app.apps.get("db_sqlalchemy")()
     try:
         """Save folder"""
-        _folder_db = Folder(**metadata, code=album_id)
+        _folder_db = Folder(**metadata, code=album_id, credential=credential)
 
         _object_content = {
             u'files': files
@@ -224,14 +226,25 @@ def save_file_db(files, album_id, metadata):
             code=_object_code,
             parent=album_id
         )
-        """Into folder to file"""
-        _folder_db.objects.append(_object_db)
-        """Save in database"""
-        _session.add(_folder_db)
+
+        """Buscar folder"""
+        _folder_db_exist = _session.query(Folder).filter_by(
+            code=album_id).first()
+
+        if not _folder_db_exist:
+            """Into folder to file"""
+            _folder_db.objects.append(_object_db)
+            """Save in database"""
+            _session.add(_folder_db)
+        else:
+            _object_db.folder = _folder_db_exist.folder
+            _session.add(_object_db)
+
         _session.commit()
 
         """Get response from db and define the response"""
-        _folder_json = _folder_db.to_dict()
+        _folder_json = _folder_db.to_dict(
+        ) if not _folder_db_exist else _folder_db_exist.to_dict()
         _object_json = _object_db.to_dict()
 
         """Define the response to cliente"""
@@ -256,8 +269,11 @@ def get_by_code_db(album, code):
 
     """Find in database"""
     _session = app.apps.get("db_sqlalchemy")()
-    _photo = _session.query(Object).filter_by(
-        parent=album, code=code).first()
+    _photo = _session.query(Object, Folder, FolderObject).\
+        join(FolderObject, Object.object == FolderObject.object, isouter=True).\
+        join(Folder, Folder.folder == FolderObject.folder, isouter=True).\
+        filter(Object.parent == album, Object.code == code).\
+        first()
     _session.close()
 
     """Check if the file exists"""
@@ -265,17 +281,22 @@ def get_by_code_db(album, code):
         return error_response_service(msg="Photo not found.")
     else:
         return success_response_service(
-            data=_photo
+            data={
+                u'folder': _photo.Folder.to_dict(),
+                u'object': _photo.Object.to_dict(),
+            }
         )
 
 
-def get_download_from_storage(file, filename):
+def get_download_from_storage(file, folder, filename):
     """Download a file from storage
 
     :param file: File instance of the file from the db
+    :param folder: File instance of the folder from the db
+    :param filename: File instance of the filename from the db
     """
     try:
-        _object = parse(file.content)
+        _object = parse(file['content'])
         _selected_file = None
         for _file in _object['files']:
             if _file['filename'] == filename:
@@ -283,7 +304,7 @@ def get_download_from_storage(file, filename):
                 break
         if not _selected_file:
             raise Exception("File not found")
-        _gphotos = GooglePhotos()
+        _gphotos = GooglePhotos(credential=folder['credential'])
 
         """Get te ddata from the storage by id"""
         _data_file = _gphotos.download(_selected_file['cloud'])

@@ -24,6 +24,7 @@ class Folder(Base, SerializerMixin):
     description = Column(String(280), default="")
     parent = Column(String(100), nullable=True)
     platform = Column(Integer, ForeignKey('platforms.platform'))
+    credential = Column(Integer, ForeignKey('credentials.credential'))
     # TODO: Implement email functionality.
     # email_to = Column(String(50))
     # email_from = Column(String(50))
@@ -38,5 +39,5 @@ class Folder(Base, SerializerMixin):
 
     """Serialize settings"""
     serialize_only = (
-        'code', 'description', 'parent', 'platform', 'created_at'
+        'code', 'description', 'parent', 'platform', 'created_at', 'credential'
     )
