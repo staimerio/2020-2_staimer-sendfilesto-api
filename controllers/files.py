@@ -14,13 +14,17 @@ import services.files.files as files
 
 # Constants
 PLATFORM_DEFAULT = App.config.get('PLATFORM_DEFAULT')
+STORAGE_CREDENTIALS_DEFAULT = App.config.get('STORAGE_CREDENTIALS_DEFAULT')
+
 
 def upload(req: Request, res: Response):
     """Upload to Storage"""
 
     """Get the files from the request, if it doesn't exist,
     return an empty list"""
-    _files = req.files.getlist('files') or list()
+    _files = req.files.getlist('files') or list()    
+    _credential = req.param(
+        'credential', default_value=STORAGE_CREDENTIALS_DEFAULT)
 
     """Check if the all obligate params are valids"""
     _validate = validate_obligate_fields({
@@ -35,7 +39,7 @@ def upload(req: Request, res: Response):
         )
 
     """Upload the file to Storage"""
-    _upload_list = files.upload_files(_files)
+    _upload_list = files.upload_files(_files, _credential)
 
     """Generate folder"""
     _folder_code = uuid.uuid1().hex

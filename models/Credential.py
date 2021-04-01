@@ -23,6 +23,7 @@ class Credential(Base, SerializerMixin):
     title = Column(String(50), nullable=False)
     key = Column(Text)
     picky = Column(LargeBinary(length=5242880))
+    parent = Column(String(100), nullable=True)
     is_active = Column(Boolean, default=True)
     is_deleted = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.now())
@@ -31,5 +32,6 @@ class Credential(Base, SerializerMixin):
     """Relationships"""
     """Serialize settings"""
     serialize_only = (
-        'credential', 'title', 'key', 'picky', 'created_at'
+        'credential', 'title', 'key', 'picky', 'created_at',
+        'parent',
     )

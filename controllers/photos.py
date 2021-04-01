@@ -15,11 +15,15 @@ from services.files import photos
 
 # Constants
 PLATFORM_DEFAULT = App.config.get('PLATFORM_DEFAULT')
+STORAGE_CREDENTIALS_DEFAULT = App.config.get('STORAGE_CREDENTIALS_DEFAULT')
 
 
 def upload(req: Request, res: Response):
     """Generate folder"""
     _album_code = req.param('album', default_value=uuid.uuid1().hex)
+    _credential = req.param(
+        'credential', default_value=STORAGE_CREDENTIALS_DEFAULT)
+
     if req.param('urls'):
         """Upload the file to Storage"""
         _upload_list = photos.download_photos_remote(
@@ -45,7 +49,7 @@ def upload(req: Request, res: Response):
         ))
     """Upload the file to Storage"""
     _uploaded_list = photos.upload_photos(
-        _upload_list['data']['success'], _album_code, req.param('album', callback=bool))
+        _upload_list['data']['success'], _album_code, req.param('album', callback=bool), credential=_credential)
 
     """Check if the upload was done"""
     if _uploaded_list['valid'] is False:

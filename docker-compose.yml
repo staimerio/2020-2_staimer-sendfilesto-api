@@ -1,0 +1,42 @@
+version: '3.7'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "1802:1802"
+    # networks:
+    #   - ian-network
+    environment:      
+      APP_HOSTNAME: '0.0.0.0'
+      APP_PORT: 1802
+      # Cloud Storage
+      STORAGE_ROOT: '1s4AFjO-1QK-DIHKCgdXmGYtm3K1wCbsx'
+      STORAGE_MAX_SIZE: 1024
+      STORAGE_TOKEN_PATH: 'services/googledrive/token.pickle'
+      STORAGE_CREDENTIALS_PATH: 'services/googledrive/credentials.json'
+      STORAGE_CREDENTIALS_DEFAULT: 1
+      # Photos
+      PLATFORM_DEFAULT: 1
+      PHOTOS_TOKEN_PATH: 'services/googlephotos/token.pickle'
+      PHOTOS_CREDENTIALS_PATH: 'services/googlephotos/credentials.json'
+      #General
+      PUBLIC_IMAGES_FOLDER: 'public/images'
+      #MYSQL database
+      MYSQL_DATABASE: 'yixzgdwv_sendfilesto'
+      MYSQL_USERNAME: 'yixzgdwv_sendfilesto'
+      MYSQL_PASSWORD: '&hBh*k{Asd!~'
+      MYSQL_PORT: 3306
+      MYSQL_HOST: 'mysql.netapi.app'
+      MYSQL_QUERY: ''
+      MYSQL_DRIVERNAME: 'mysql+pymysql'
+      MYSQL_ECHO: 0
+      MYSQL_POOL_PREPING: 1
+      MYSQL_POOL_SIZE: 20
+      MYSQL_MAX_OVERFLOW: 0
+      #Others
+      MAX_SIZE_URLS: 30    
+# networks:
+#   ian-network:
+#     external: true

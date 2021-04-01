@@ -28,6 +28,9 @@ import mimetypes
 # Retic
 from retic import App
 
+# Services
+from services.google.apigoogle import get_credentials
+
 # Constants
 """If modifying these scopes, delete the file token.pickle."""
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -35,14 +38,16 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 # Constants
 STORAGE_TOKEN_PATH = App.config.get('STORAGE_TOKEN_PATH')
 STORAGE_CREDENTIALS_PATH = App.config.get('STORAGE_CREDENTIALS_PATH')
+STORAGE_CREDENTIALS_DEFAULT = App.config.get('STORAGE_CREDENTIALS_DEFAULT')
 
 mimetypes.init()
 
 
 class GoogleDrive():
-    def __init__(self):
+    def __init__(self, credential=STORAGE_CREDENTIALS_DEFAULT):
         """Instance of Google Drive"""
-        self.service = self.login()
+        self.service = self.login_v2(credential)
+        self.credential = credential
 
     def login(self):
         """Login a user with credentials from a json file and 
@@ -69,6 +74,15 @@ class GoogleDrive():
                 pickle.dump(_creds, token)
         """Return a services that allows it interactive with the storage"""
         return build('drive', 'v3', credentials=_creds)
+
+    def login_v2(self, credential):
+        """Login a user with credentials from a json file and
+        create a token for the next requests"""
+
+        """Get credential from db"""
+        self.token = get_credentials(credential)
+        """Return a services that allows it interactive with the storage"""
+        return build('drive', 'v3', credentials=self.token)
 
     def create_media_file(self, file):
         """Media of the file"""

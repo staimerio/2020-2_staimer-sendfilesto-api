@@ -21,9 +21,12 @@ from retic.services.responses import success_response_service, error_response_se
 # Utils
 from services.utils.general import get_bytes_from_mb, get_mb_from_bytes
 
+# Models
+from models import Credential
+
+
 # Constants
 MAX_SIZE = get_bytes_from_mb(env.int("STORAGE_MAX_SIZE"))
-
 
 def upload(file, gd):
     """Upload a file to google drive
@@ -32,7 +35,11 @@ def upload(file, gd):
 
     try:
         """Upload the file to Storage"""
-        _parent = env("STORAGE_ROOT")
+        _session = app.apps.get("db_sqlalchemy")()
+        _credential_db = _session.query(Credential).filter_by(
+            credential=gd.credential).first()
+
+        _parent = _credential_db.parent
 
         """Define the media of the file"""
         _media = gd.create_media_file(file)
@@ -71,7 +78,7 @@ def upload(file, gd):
         return error_response_service(str(err))
 
 
-def upload_files(files):
+def upload_files(files, credential):
     """Upload a file list to google drive
 
     :param files: Files from a client, it's a stream list of a files"""
@@ -79,7 +86,7 @@ def upload_files(files):
     try:
         _files_upload_success = []
         _files_upload_error = []
-        _gd = GoogleDrive()
+        _gd = GoogleDrive(credential=credential)
         """Upload the file to Storage"""
         for _file in files:
             """Define the media of the file"""
