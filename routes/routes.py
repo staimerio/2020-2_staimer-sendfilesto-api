@@ -24,6 +24,7 @@ router.options("/*", cors())
 # Files routes
 router \
     .post("/files", files.upload) \
+    .post("/files/remote-upload", files.upload_remote) \
     .get("/files/:id", files.get_by_id)
 
 router \

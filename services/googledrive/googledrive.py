@@ -93,6 +93,17 @@ class GoogleDrive():
         )
         return _media
 
+    def create_media_file_binary(self, file):
+        _file = BytesIO(b64decode(file))
+        _mimetype = 'application/octet-stream'
+        """Media of the file"""
+        _media = MediaIoBaseUpload(
+            _file,
+            mimetype=_mimetype,
+            resumable=True
+        )
+        return _media
+
     def upload(self, media_body, name, parents=[]):
         """Upload a file to google storage
 

@@ -42,5 +42,5 @@ class File(Base, SerializerMixin):
     serialize_only = (
         'file', 'filename', 'code', 'size',
         'mimetype', 'extension', 'created_at',
-        'width', 'height', 'title', 'parent', 'cloud'
+        'width', 'height', 'title', 'parent'
     )

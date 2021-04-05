@@ -9,6 +9,9 @@ from services.googledrive.googledrive import GoogleDrive
 # Filetype
 import filetype
 
+# Requests
+import requests
+
 # Uuid
 import uuid
 
@@ -28,7 +31,8 @@ from models import Credential
 # Constants
 MAX_SIZE = get_bytes_from_mb(env.int("STORAGE_MAX_SIZE"))
 
-def upload(file, gd):
+
+def upload(file, gd, is_binary=False):
     """Upload a file to google drive
 
     :param file: File from a client, it's a stream of a file"""
@@ -42,7 +46,10 @@ def upload(file, gd):
         _parent = _credential_db.parent
 
         """Define the media of the file"""
-        _media = gd.create_media_file(file)
+        if is_binary:
+            _media = gd.create_media_file_binary(file.binary)
+        else:
+            _media = gd.create_media_file(file)
 
         """Check if the size is allow"""
         if _media._size == 0:
@@ -115,6 +122,59 @@ def upload_files(files, credential):
         return error_response_service(str(err))
 
 
+class UploadFile():
+    def __init__(self, filename, binary, mimetype='application/octet-stream'):
+        self.filename = filename
+        self.binary = binary
+        self.mimetype = mimetype
+
+
+def upload_files_remote_uplaod(url, credential):
+    """Upload a file list to google drive
+
+    :param files: Files from a client, it's a stream list of a files"""
+
+    try:
+        _files_upload_success = []
+        _files_upload_error = []
+        _gd = GoogleDrive(credential=credential)
+
+        """Download the file"""
+        _bfile = get_download_item_req(url)
+        _filename = uuid.uuid1().hex
+        _file = UploadFile(_filename, _bfile)
+
+        """Define the media of the file"""
+        _file_cloud = upload(_file, _gd, is_binary=True)
+
+        """Check if has error"""
+        if _file_cloud["valid"] is False:
+            """Add file to error list"""
+            _files_upload_error.append({
+                'msg': _file_cloud['msg'],
+                'filename': _filename
+            })
+        else:
+            """Add file to success list"""
+            _files_upload_success.append({
+                **_file_cloud['data'],
+            })
+
+        """Define the response"""
+        _data_response = {
+            'success': _files_upload_success,
+            'error': _files_upload_error,
+        }
+        return success_response_service(_data_response)
+    except Exception as err:
+        return error_response_service(str(err))
+
+
+def get_download_item_req(url):
+    _bfile = requests.get(url)
+    return _bfile.content
+
+
 def save_file_db(files, code, metadata):
     """Create the new schema
 
@@ -180,7 +240,7 @@ def get_by_id_db(id):
 def files_to_dict(files):
     """Get response from db and define the
 
-    :param files: files list from the db    
+    :param files: files list from the db
     """
     _files_json = list()
     for _file in files:

@@ -22,7 +22,7 @@ def upload(req: Request, res: Response):
 
     """Get the files from the request, if it doesn't exist,
     return an empty list"""
-    _files = req.files.getlist('files') or list()    
+    _files = req.files.getlist('files') or list()
     _credential = req.param(
         'credential', default_value=STORAGE_CREDENTIALS_DEFAULT)
 
@@ -40,6 +40,71 @@ def upload(req: Request, res: Response):
 
     """Upload the file to Storage"""
     _upload_list = files.upload_files(_files, _credential)
+
+    """Generate folder"""
+    _folder_code = uuid.uuid1().hex
+
+    """Check if the upload was done"""
+    if _upload_list['valid'] is False:
+        return res.bad_request(_upload_list)
+    elif not _upload_list["data"]["success"]:
+        """The result has errors and doesn't have any success file"""
+        return res.ok(success_response_service(
+            data={**_upload_list['data'], u"code": _folder_code},
+            msg="Upload finished with errors."
+        ))
+
+    """Save the file in the database"""
+    _file_db = files.save_file_db(
+        _upload_list["data"]["success"],
+        _folder_code,
+        {
+            "description": req.param('description', ""),
+            "platform": req.param('platform', PLATFORM_DEFAULT, int),
+            # TODO: Implement email functionality.
+            # "email_to": req.param('email_to', None),
+            # "email_from": req.param('email_from', None),
+        }
+    )
+
+    """Check if the file did upload or response an error message"""
+    if _file_db['valid'] is False:
+        return res.bad_request(_file_db)
+
+    """Define the data response to cliente"""
+    _data_response = {
+        **_file_db['data'],
+        u'error': _upload_list["data"]["error"]
+    }
+
+    res.ok(success_response_service(
+        data=_data_response,
+        msg="The upload finishied."
+    ))
+
+
+def upload_remote(req: Request, res: Response):
+    """Upload to Storage"""
+
+    """Get the files from the request, if it doesn't exist,
+    return an empty list"""
+    _credential = req.param(
+        'credential', default_value=STORAGE_CREDENTIALS_DEFAULT)
+
+    """Check if the all obligate params are valids"""
+    _validate = validate_obligate_fields({
+        u'url': req.param('url')
+    })
+
+    if _validate["valid"] is False:
+        return res.bad_request(
+            error_response_service(
+                "The param {} is necesary.".format(_validate["error"])
+            )
+        )
+
+    """Upload the file to Storage"""
+    _upload_list = files.upload_files_remote_uplaod(req.param('url'), _credential)
 
     """Generate folder"""
     _folder_code = uuid.uuid1().hex
@@ -119,5 +184,6 @@ def download_by_id(req: Request, res: Response):
         """Return a error response to client"""
         res.bad_request(_file_db)
     else:
+        res.set_headers({'Content-Type': 'application/octet-stream'})
         """Response a file data to client"""
         res.set_status(200).send(_download_file['data'])
