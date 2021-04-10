@@ -25,3 +25,8 @@ def rmfile(path):
     :param path: Path of the folder with files to will delete
     """
     os.remove(path)
+
+def is_windows():
+    if os.name == 'nt':
+        return True
+    return False

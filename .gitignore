@@ -18,3 +18,4 @@ dist
 *token.pickle*
 .htaccess
 alembic.ini
+public/bin/*

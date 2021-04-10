@@ -23,6 +23,7 @@ from retic.services.responses import success_response_service, error_response_se
 
 # Utils
 from services.utils.general import get_bytes_from_mb, get_mb_from_bytes
+# import services.drivers.selenium as selenium
 
 # Models
 from models import Credential
@@ -129,7 +130,7 @@ class UploadFile():
         self.mimetype = mimetype
 
 
-def upload_files_remote_uplaod(url, credential):
+def upload_files_remote_uplaod(url, credential, driver):
     """Upload a file list to google drive
 
     :param files: Files from a client, it's a stream list of a files"""
@@ -140,7 +141,9 @@ def upload_files_remote_uplaod(url, credential):
         _gd = GoogleDrive(credential=credential)
 
         """Download the file"""
-        _bfile = get_download_item_req(url)
+        _bfile = get_download_item_req(url, driver=driver)
+        if not _bfile:
+            raise Exception('File was not download.')
         _filename = uuid.uuid1().hex
         _file = UploadFile(_filename, _bfile)
 
@@ -170,9 +173,18 @@ def upload_files_remote_uplaod(url, credential):
         return error_response_service(str(err))
 
 
-def get_download_item_req(url):
-    _bfile = requests.get(url)
-    return _bfile.content
+def get_download_item_req(url, driver='none'):
+    if driver == 'none':
+        _headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+        _bfile = requests.get(url, headers=_headers)
+        return _bfile.content
+    # elif driver == 'selenium':
+    #     _bfile = selenium.download_file(url)
+    #     return _bfile
+    return None
 
 
 def save_file_db(files, code, metadata):

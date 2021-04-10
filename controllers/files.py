@@ -15,6 +15,7 @@ import services.files.files as files
 # Constants
 PLATFORM_DEFAULT = App.config.get('PLATFORM_DEFAULT')
 STORAGE_CREDENTIALS_DEFAULT = App.config.get('STORAGE_CREDENTIALS_DEFAULT')
+DRIVER_REQUEST_DEFAULT = App.config.get('DRIVER_REQUEST_DEFAULT')
 
 
 def upload(req: Request, res: Response):
@@ -90,6 +91,8 @@ def upload_remote(req: Request, res: Response):
     return an empty list"""
     _credential = req.param(
         'credential', default_value=STORAGE_CREDENTIALS_DEFAULT)
+    _driver = req.param(
+        'driver', default_value=DRIVER_REQUEST_DEFAULT,)
 
     """Check if the all obligate params are valids"""
     _validate = validate_obligate_fields({
@@ -104,7 +107,8 @@ def upload_remote(req: Request, res: Response):
         )
 
     """Upload the file to Storage"""
-    _upload_list = files.upload_files_remote_uplaod(req.param('url'), _credential)
+    _upload_list = files.upload_files_remote_uplaod(
+        req.param('url'), _credential, driver=_driver)
 
     """Generate folder"""
     _folder_code = uuid.uuid1().hex

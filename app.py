@@ -4,7 +4,7 @@
 from retic import App as app
 
 # Settings
-# import settings
+import settings
 
 # Routes
 from routes.routes import router
