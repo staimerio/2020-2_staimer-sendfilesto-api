@@ -188,6 +188,9 @@ def get_download_item_req(url, driver='none'):
     elif driver == 'cmd':
         _bfile = cmd.download_file(url)
         return _bfile
+    elif driver == 'wget':
+        _bfile = cmd.download_file_cmd(url)
+        return _bfile
     return None
 
 
