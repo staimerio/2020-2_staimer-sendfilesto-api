@@ -23,18 +23,15 @@ def download_file_cmd(url, stdout=None, stderr=None):
     _filename = uuid.uuid1().hex
     _output_path = "{0}/{1}".format(PUBLIC_FILES_FOLDER, _filename,)
     try:
-        process = subprocess.Popen(['wget "{0}"'.format(
-            url),'-O', _output_path ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = process.communicate()
+        _cmd = ['wget', '-O', _output_path, '"{0}"'.format(url)]
+        process = subprocess.call(_cmd)
     except OSError as e:
-        if e.errno == errno.ENOENT:
-            raise Exception(
-                "Executable '{0}' not found".format(self.executable))
-        else:
-            raise
+        raise Exception(
+            "Executable '{0}' not found".format(self.executable))
     _file = open(_output_path, 'rb')  # opening a binary file
     _binary_file = _file.read()
     return _binary_file
+
 
 def _merge_args_opts(args_opts_dict, **kwargs):
     """Merge options with their corresponding arguments.
