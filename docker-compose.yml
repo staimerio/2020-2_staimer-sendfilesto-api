@@ -37,6 +37,6 @@ services:
       MYSQL_MAX_OVERFLOW: 0
       #Others
       MAX_SIZE_URLS: 30    
-# networks:
+      DRIVER_REQUEST_DEFAULT: 'none'
 #   ian-network:
 #     external: true
