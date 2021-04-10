@@ -23,6 +23,7 @@ services:
       PHOTOS_CREDENTIALS_PATH: 'services/googlephotos/credentials.json'
       #General
       PUBLIC_IMAGES_FOLDER: 'public/images'
+      PUBLIC_FILES_FOLDER: 'public/files'
       #MYSQL database
       MYSQL_DATABASE: 'yixzgdwv_sendfilesto'
       MYSQL_USERNAME: 'yixzgdwv_sendfilesto'
