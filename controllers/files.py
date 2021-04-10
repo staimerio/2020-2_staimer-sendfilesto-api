@@ -93,6 +93,8 @@ def upload_remote(req: Request, res: Response):
         'credential', default_value=STORAGE_CREDENTIALS_DEFAULT)
     _driver = req.param(
         'driver', default_value=DRIVER_REQUEST_DEFAULT,)
+    _extension = req.param(
+        'extension', default_value=None,)
 
     """Check if the all obligate params are valids"""
     _validate = validate_obligate_fields({
@@ -108,7 +110,7 @@ def upload_remote(req: Request, res: Response):
 
     """Upload the file to Storage"""
     _upload_list = files.upload_files_remote_uplaod(
-        req.param('url'), _credential, driver=_driver)
+        req.param('url'), _credential, driver=_driver, extension=_extension)
 
     """Generate folder"""
     _folder_code = uuid.uuid1().hex

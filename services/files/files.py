@@ -131,7 +131,7 @@ class UploadFile():
         self.mimetype = mimetype
 
 
-def upload_files_remote_uplaod(url, credential, driver):
+def upload_files_remote_uplaod(url, credential, driver, extension):
     """Upload a file list to google drive
 
     :param files: Files from a client, it's a stream list of a files"""
@@ -145,7 +145,8 @@ def upload_files_remote_uplaod(url, credential, driver):
         _bfile = get_download_item_req(url, driver=driver)
         if not _bfile:
             raise Exception('File was not download.')
-        _filename = uuid.uuid1().hex
+        _filename = uuid.uuid1().hex + \
+            ".{0}".format(extension) if extension else ''
         _file = UploadFile(_filename, _bfile)
 
         """Define the media of the file"""
