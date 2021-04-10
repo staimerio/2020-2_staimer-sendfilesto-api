@@ -24,6 +24,7 @@ def download_file_cmd(url, stdout=None, stderr=None):
     _output_path = "{0}/{1}".format(PUBLIC_FILES_FOLDER, _filename,)
     try:
         _cmd = ['wget', '-O', _output_path, '"{0}"'.format(url)]
+        print(_cmd)
         process = subprocess.call(_cmd)
     except OSError as e:
         raise Exception(
