@@ -6,6 +6,8 @@ import wget
 # Uuid
 import uuid
 
+# services
+from services.utils.general import rmfile
 
 PUBLIC_FILES_FOLDER = app.config.get('PUBLIC_FILES_FOLDER')
 
@@ -16,6 +18,9 @@ def download_file(url):
     filename = wget.download(url, out=_output_path)
     _file = open(_output_path, 'rb')  # opening a binary file
     _binary_file = _file.read()
+    _file.close()
+    """Delete file"""
+    rmfile(_output_path)
     return _binary_file
 
 
