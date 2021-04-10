@@ -24,6 +24,7 @@ from retic.services.responses import success_response_service, error_response_se
 # Utils
 from services.utils.general import get_bytes_from_mb, get_mb_from_bytes
 # import services.drivers.selenium as selenium
+import services.drivers.cmd as cmd
 
 # Models
 from models import Credential
@@ -184,6 +185,9 @@ def get_download_item_req(url, driver='none'):
     # elif driver == 'selenium':
     #     _bfile = selenium.download_file(url)
     #     return _bfile
+    elif driver == 'cmd':
+        _bfile = cmd.download_file(url)
+        return _bfile
     return None
 
 

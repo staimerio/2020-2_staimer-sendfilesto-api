@@ -14,5 +14,6 @@ aiohttp==3.7.1
 alembic==1.4.2
 Pillow
 # selenium
+wget
 # retic autopep8 google-api-python-client google-auth-httplib2 google-auth-oauthlib SQLAlchemy mysql-connector-python PyMySQL SQLAlchemy-serializer filetype
 # uuid requests aiohttp alembic
