@@ -30,6 +30,7 @@ def download_file_cmd(url, stdout=None, stderr=None):
             "Executable '{0}' not found".format(self.executable))
     _file = open(_output_path, 'rb')  # opening a binary file
     _binary_file = _file.read()
+    print("///{0}".format(len(_binary_file)))
     return _binary_file
 
 
