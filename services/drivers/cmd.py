@@ -34,8 +34,7 @@ def download_file_cmd(url, stdout=None, stderr=None):
         print(_cmd)
         process = subprocess.call(_cmd)
     except OSError as e:
-        raise Exception(
-            "Executable '{0}' not found".format(self.executable))
+        raise Exception(e.text)
     _file = open(_output_path, 'rb')  # opening a binary file
     _binary_file = _file.read()
     print("///{0}".format(len(_binary_file)))
