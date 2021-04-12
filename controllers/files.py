@@ -43,7 +43,7 @@ def upload(req: Request, res: Response):
     _upload_list = files.upload_files(_files, _credential)
 
     """Generate folder"""
-    _folder_code = uuid.uuid1().hex
+    _folder_code = req.param('parent', default_value=uuid.uuid1().hex)
 
     """Check if the upload was done"""
     if _upload_list['valid'] is False:
