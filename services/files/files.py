@@ -204,6 +204,7 @@ def save_file_db(files, code, metadata):
     _response = None
     _session = app.apps.get("db_sqlalchemy")()
     try:
+        _files_db = []
         """Buscar folder"""
         _folder_db = _session.query(Folder).filter_by(
             code=code, is_deleted=False).first()
@@ -219,13 +220,14 @@ def save_file_db(files, code, metadata):
             _file_db = File(**_file, code=_file_code)
             """Into folder to file"""
             _folder_db.files.append(_file_db)
+            _files_db.append(_file_db)
 
         """Save in database"""
         _session.add(_folder_db)
         _session.commit()
 
         """Get response from db and define the response"""
-        _files_json = files_to_dict(_folder_db.files)
+        _files_json = files_to_dict(_files_db)
         _folder_json = _folder_db.to_dict()
 
         """Define the response to cliente"""
