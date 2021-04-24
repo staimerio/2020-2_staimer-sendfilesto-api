@@ -204,8 +204,12 @@ def save_file_db(files, code, metadata):
     _response = None
     _session = app.apps.get("db_sqlalchemy")()
     try:
+        """Buscar folder"""
+        _folder_db = _session.query(Folder).filter_by(
+            code=code, is_deleted=False).first()
         """Save folder"""
-        _folder_db = Folder(**metadata, code=code)
+        if not _folder_db:
+            _folder_db = Folder(**metadata, code=code)
 
         """Create File instance for insert to db"""
         for _file in files:
