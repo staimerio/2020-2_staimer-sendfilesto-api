@@ -10,11 +10,10 @@ from models import File, Folder
 from retic.services.responses import success_response_service, error_response_service
 
 # SQLAlchemy
-from sqlalchemy import update
+from sqlalchemy import update, desc
 
 # Time
 from datetime import datetime
-
 
 def get_all_by_folder_db(code):
     """Find all files in the database by a key and his value
@@ -33,7 +32,7 @@ def get_all_by_folder_db(code):
 
     """Search files in the folder"""
     _files_db = _session.query(File).join(
-        File.folders).filter_by(code=code)
+        File.folders).filter_by(code=code).order_by(desc(File.filename)).all()
 
     """Close the session"""
     _session.close()
