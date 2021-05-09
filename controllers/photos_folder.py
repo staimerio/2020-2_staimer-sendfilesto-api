@@ -135,7 +135,7 @@ def show_by_code(req: Request, res: Response):
     """Return the data to client"""
     if _download_file['valid'] is False:
         """Return a error response to client"""
-        res.bad_request(_photo_db)
+        res.bad_request(_download_file)
     else:
         """Response a file data to client"""
         _img_req = _download_file['data']
