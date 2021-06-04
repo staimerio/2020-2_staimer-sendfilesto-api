@@ -15,6 +15,7 @@ from sqlalchemy import update, desc
 # Time
 from datetime import datetime
 
+
 def get_all_by_folder_db(code):
     """Find all files in the database by a key and his value
 
@@ -76,7 +77,9 @@ def get_folder_by_id_db(code):
     _folder_db = _session.query(Folder).filter_by(
         code=code, is_deleted=False).first()
     if not _folder_db:
-        return error_response_service(msg="Folder not found.")
+        return success_response_service(
+            data={}, msg="Folder not found."
+        )
 
     """Make changes"""
     _folder_db.is_deleted = True
@@ -89,7 +92,7 @@ def get_folder_by_id_db(code):
     _data_response = {
         **_folder_db.to_dict()
     }
-    
+
     """Close the session"""
     _session.close()
     return success_response_service(

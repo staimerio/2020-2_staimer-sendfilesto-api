@@ -39,5 +39,5 @@ class Folder(Base, SerializerMixin):
 
     """Serialize settings"""
     serialize_only = (
-        'code', 'description', 'parent', 'platform', 'created_at', 'credential'
+        'code', 'description', 'parent', 'platform', 'created_at', 'credential', 'folder'
     )

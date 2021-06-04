@@ -15,8 +15,10 @@ import requests
 # Uuid
 import uuid
 
+from sqlalchemy import desc
+
 # Models
-from models import File, Folder
+from models import File, Folder, FolderFile, Credential
 
 # Services
 from retic.services.responses import success_response_service, error_response_service
@@ -25,9 +27,6 @@ from retic.services.responses import success_response_service, error_response_se
 from services.utils.general import get_bytes_from_mb, get_mb_from_bytes
 # import services.drivers.selenium as selenium
 import services.drivers.cmd as cmd
-
-# Models
-from models import Credential
 
 
 # Constants
@@ -291,3 +290,34 @@ def get_download_from_storage(file):
         )
     except Exception as err:
         return error_response_service(str(err))
+
+
+def get_latest_files(limit):
+    """Find in database"""
+    _session = app.apps.get("db_sqlalchemy")()
+    _items = _session.query(Folder, File, FolderFile).\
+        join(Folder, Folder.folder == FolderFile.folder, isouter=True).\
+        join(File, File.file == FolderFile.file, isouter=True).\
+        order_by(desc(File.file)).\
+        limit(limit).\
+        all()
+
+    _session.close()
+
+    """Check if the file exists"""
+    if not _items:
+        return error_response_service(msg="Items not found.")
+    """Transform data"""
+    _items_response = [
+        {
+            **_item.File.to_dict(),
+            **_item.Folder.to_dict(),
+        } for _item in _items
+    ]
+
+    _data_response = {
+        u"files": _items_response,
+    }
+    return success_response_service(
+        data=_data_response, msg="Items found."
+    )

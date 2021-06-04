@@ -16,6 +16,7 @@ import services.files.files as files
 PLATFORM_DEFAULT = App.config.get('PLATFORM_DEFAULT')
 STORAGE_CREDENTIALS_DEFAULT = App.config.get('STORAGE_CREDENTIALS_DEFAULT')
 DRIVER_REQUEST_DEFAULT = App.config.get('DRIVER_REQUEST_DEFAULT')
+LATESTS_LIMIT = App.config.get('LATESTS_LIMIT')
 
 
 def upload(req: Request, res: Response):
@@ -193,3 +194,15 @@ def download_by_id(req: Request, res: Response):
         res.set_headers({'Content-Type': 'application/octet-stream'})
         """Response a file data to client"""
         res.set_status(200).send(_download_file['data'])
+
+
+def get_latest(req: Request, res: Response):
+    """Get latest"""
+
+    _files = files.get_latest_files(
+        limit=req.param('parent', default_value=LATESTS_LIMIT)
+    )
+    """Check if the upload was done"""
+    if _files['valid'] is False:
+        return res.bad_request(_files)
+    res.ok(_files)

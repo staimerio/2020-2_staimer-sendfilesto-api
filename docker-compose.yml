@@ -39,5 +39,6 @@ services:
       #Others
       MAX_SIZE_URLS: 30    
       DRIVER_REQUEST_DEFAULT: 'none'
+      LATESTS_LIMIT: 20
 #   ian-network:
 #     external: true

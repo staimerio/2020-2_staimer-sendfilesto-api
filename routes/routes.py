@@ -24,6 +24,9 @@ router.options("/*", cors())
 # Files routes
 router \
     .post("/files", files.upload) \
+    .get("/files", files.get_latest)
+
+router \
     .post("/files/remote-upload", files.upload_remote) \
     .get("/files/:id", files.get_by_id)
 
@@ -38,7 +41,7 @@ router \
 router \
     .get("/photos/:album/:filename", photos.show_by_filename)
 
-    
+
 router \
     .post("/photos/folder", photos_folder.upload_folder)
 router \
