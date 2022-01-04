@@ -19,24 +19,28 @@ def compress_images(images):
     _images = []
 
     for _image in images:
-        _image['filename'] = _image['filename'].replace('.png', '.jpg')
-        """Path of the image"""
-        _output_image_path = "{0}/{1}".format(
-            PUBLIC_IMAGES_FOLDER, _image['filename'])
-        """Add extension if it hasnt"""
-        if '.jpg' not in PUBLIC_IMAGES_FOLDER:
-            _output_image_path += '.jpg'
-        _image_ins = Image.open(BytesIO(_image['binary']))
-        """Save image"""
-        _image_ins.convert('RGB').save(
-            _output_image_path, optimize=True, quality=30)
-        """Open image"""
-        with open(_output_image_path, "rb") as image_file:
-            _images.append({
-                **_image,
-                'binary': image_file.read(),
-            })
-        """Delete image"""
-        rmfile(_output_image_path)
+        try:
+            _image['filename'] = _image['filename'].replace('.png', '.jpg')
+            """Path of the image"""
+            _output_image_path = "{0}/{1}".format(
+                PUBLIC_IMAGES_FOLDER, _image['filename'])
+            """Add extension if it hasnt"""
+            if '.jpg' not in PUBLIC_IMAGES_FOLDER:
+                _output_image_path += '.jpg'
+            _image_ins = Image.open(BytesIO(_image['binary']))
+            """Save image"""
+            _image_ins.convert('RGB').save(
+                _output_image_path, optimize=True, quality=30)
+            """Open image"""
+            with open(_output_image_path, "rb") as image_file:
+                _images.append({
+                    **_image,
+                    'binary': image_file.read(),
+                })
+            """Delete image"""
+            rmfile(_output_image_path)
+        except Exception as err:
+            pass
+        
 
     return _images

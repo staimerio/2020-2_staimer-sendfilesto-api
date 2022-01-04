@@ -282,7 +282,7 @@ def get_by_code_db(album, code):
     else:
         return success_response_service(
             data={
-                u'folder': _photo.Folder.to_dict(),
+                u'folder': _photo.Folder.to_dict() if _photo.Folder else None,
                 u'object': _photo.Object.to_dict(),
             }
         )

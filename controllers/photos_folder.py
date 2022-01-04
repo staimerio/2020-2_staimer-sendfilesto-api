@@ -124,7 +124,7 @@ def show_by_code(req: Request, res: Response):
     )
 
     """Check if the file was found or response an error message"""
-    if _photo_db['valid'] is False:
+    if _photo_db['valid'] is False or _photo_db['data']['folder'] is None:
         return res.not_found(_photo_db)
 
     """Download from storage by id"""
