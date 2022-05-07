@@ -114,15 +114,18 @@ class GooglePhotos():
         """Login a user with credentials from a json file and
         create a token for the next requests"""
 
-        
         """Get credential from db"""
         self.token = get_credentials(credential)
         """Return a services that allows it interactive with the storage"""
         return build('photoslibrary', 'v1', credentials=self.token)
-        
+
     def create_media_file(self, file, extension):
         _file = BytesIO(b64decode(file))
-        _mimetype = mimetypes.types_map[extension] or 'application/octet-stream'
+        _mimetypes = {
+            **mimetypes.types_map,
+            ".webp": "image/webp"
+        }
+        _mimetype = _mimetypes[extension] if extension in _mimetypes else 'application/octet-stream'
         """Media of the file"""
         _media = MediaIoBaseUpload(
             _file,
